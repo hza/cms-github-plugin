@@ -23,7 +23,7 @@
             </div>
         </form>
 
-        <div style="font-size: 95%; color: gray; padding-bottom: 10px;">
+        <div style="font-size: 95%; color: gray; padding-bottom: 10px; clear:both;">
             <xsl:text>You can use comma or space separated tickets in format </xsl:text>
             <a href="#" style="border-bottom: 1px dashed blue; text-decoration: none;"
                onclick="document.forms.v1.tickets.value = 'D-01784 B-01758'; return false;">
@@ -73,6 +73,7 @@
             });
         </script>
 
+        <br/>
         <br/>
 
 
