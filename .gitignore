@@ -1,0 +1,5 @@
+*.iml
+*.ipr
+*.iws
+target/
+/src/test/resources/github-plugin.properties
