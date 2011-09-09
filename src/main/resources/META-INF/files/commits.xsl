@@ -97,13 +97,7 @@
                 });
 
                 $('.plus').click(function(){
-                    var next = $(this).next();
-                    if ( next.is(':visible') ) {
-                        next.hide();
-                    } else {
-                        next.show();
-                    }
-
+                    $(this).next().toggle();
                     return false;
                 });
             });
@@ -124,10 +118,10 @@
         </form>
 
         <div style="font-size: 95%; color: gray; padding-bottom: 10px; clear:both;">
-            <xsl:text>You can use comma or space separated tickets in format </xsl:text>
+            <xsl:text>You can use comma or space separated search subwords in format </xsl:text>
             <a href="#" style="border-bottom: 1px dashed blue; text-decoration: none;"
-               onclick="document.forms.v1.tickets.value = 'D-01784 B-01758'; return false;">
-                <xsl:text>D-01784 B-01758</xsl:text>
+               onclick="document.forms.v1.tickets.value = 'user panel'; return false;">
+                <xsl:text>user panel</xsl:text>
             </a>
         </div>
 
