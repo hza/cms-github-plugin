@@ -10,11 +10,111 @@
     <xsl:output method="xml"/>
 
     <xsl:template match="/">
+
+
+        <style type="text/css">
+            .plus {
+                border-left: 1px solid #cccccc;
+                border-right: 1px solid #cccccc;
+                cursor: pointer;
+                background: #f2f2f2;
+                border-top: 1px solid #cccccc;
+                padding: 3px;
+                clear: both;
+            }
+
+            .row {
+                border-left: 1px solid #cccccc;
+                border-right: 1px solid #cccccc;
+                display: none;
+            }
+
+            .cb {
+                clear: both;
+            }
+
+            .marker {
+                float: left;
+                margin: 0 4px 0 4px;
+                width: 20px;
+            }
+
+            .ticket {
+                float:left;
+                margin-left: 4px;
+            }
+
+            .txt {
+                float: left;
+                margin: 0 8px 0 8px;
+                height: 18px;
+                width: 700px;
+                overflow: hidden;
+            }
+
+            .rtable {
+                overflow: auto;
+                margin-top: 20px;
+                border-bottom: 1px solid #cccccc;
+            }
+
+            .bold {
+                font-weight: bold;
+            }
+
+            .gray {
+                color: gray;
+            }
+
+            .branch {
+                margin-left: 20px;
+                font-weight: bold;
+                font-size: 120%;
+            }
+
+            .msg {
+                white-space: pre-wrap;
+                margin-left: 40px;
+                font-family: 'Bitstream Vera Sans Mono','Courier New',monospace;
+                font-size: 12px;
+                padding-bottom: 8px;
+            }
+        </style>
+
+        <script type="text/javascript">
+            jQuery(function($){
+                $('#search').click(function(){
+                    var branches = [];
+                    var length = $('.branch').each(function(){
+                        if (this.checked){
+                            branches.push(this.value);
+                        }
+                    }).length;
+
+                    if (length != branches.length) {
+                        $('#branches_id').val(branches.join(' ')).attr('disabled', '');
+                    }
+                });
+
+                $('.plus').click(function(){
+                    var next = $(this).next();
+                    if ( next.is(':visible') ) {
+                        next.hide();
+                    } else {
+                        next.show();
+                    }
+
+                    return false;
+                });
+            });
+        </script>
+
+
         <form name="v1" action="" method="get">
             <input id="branches_id" name="branches" type="hidden" value="" disabled="disabled"/>
             <div style="clear: both">
                 <div style="float:left; font-weight: bold; font-size: 150%; width: 180px;">
-                    <xsl:text>Search for V1 tickets : </xsl:text>
+                    <xsl:text>Search in commits : </xsl:text>
                 </div>
                 <input style="float:left; font-size: 150%; padding: 2px; margin-left: 20px;" type="text" name="tickets">
                     <xsl:attribute name="value"><xsl:value-of select="//querystring/parameter[@name='tickets']"/></xsl:attribute>
@@ -31,7 +131,7 @@
             </a>
         </div>
 
-        <div style="clear: both">
+        <div class="cb">
             <div style="float:left; font-weight: bold; font-size: 100%; width: 200px;">
                 <xsl:text>Branches : </xsl:text>
             </div>
@@ -54,100 +154,116 @@
 
                 </xsl:for-each>
             </div>
+            <div class="cb"><xsl:text> </xsl:text></div>
         </div>
 
-        <script type="text/javascript">
-            jQuery(function($){
-                $('#search').click(function(){
-                    var branches = [];
-                    var length = $('.branch').each(function(){
-                        if (this.checked){
-                            branches.push(this.value);
-                        }
-                    }).length;
-
-                    if (length != branches.length) {
-                        $('#branches_id').val(branches.join(' ')).attr('disabled', '');
-                    }
-                });
-            });
-        </script>
-
-        <br/>
-        <br/>
-
-
-        <table style="border: 1px dashed blue; ">
-            <tr>
-                <th>Ticket</th>
-                <th>Description</th>
-
-                <xsl:for-each select="//github-plugin-document/branches/branch[@visible='true']">
-                    <th><xsl:value-of select="@name"/></th>
-                </xsl:for-each>
-
-            </tr>
+        <div class="rtable">
             <xsl:for-each select="//github-plugin-document/tickets/ticket">
-                <tr>
-                    <td>
+                <div class="plus">
+
+                    <div class="ticket">
                         <a target="_blank" style="white-space: nowrap;">
                             <xsl:attribute name="href">
                                 <xsl:text>https://www6.v1host.com/ENONIC01/assetdetail.v1?number=</xsl:text><xsl:value-of
                                     select="@code"/>
                             </xsl:attribute>
+
                             <xsl:value-of select="@code"/>
                         </a>
-                    </td>
-
-                    <td>
-                        <xsl:value-of select="@message"/>
-                    </td>
+                    </div>
 
                     <xsl:call-template name="branches-output">
                         <xsl:with-param name="ticket" select="."/>
                     </xsl:call-template>
-                </tr>
+
+                    <div class="txt">
+                        <xsl:value-of select="@message"/>
+                    </div>
+
+                    <div class="cb"><xsl:text> </xsl:text></div>
+                </div>
+
+                <xsl:call-template name="tickets-output">
+                    <xsl:with-param name="ticket" select="."/>
+                </xsl:call-template>
+
             </xsl:for-each>
-        </table>
+        </div>
+    </xsl:template>
+
+    <xsl:template name="tickets-output">
+        <xsl:param name="ticket"/>
+
+        <div class="row">
+            <xsl:for-each select="//github-plugin-document/branches/branch[@visible='true']">
+                <xsl:call-template name="ticket-output">
+                    <xsl:with-param name="ticket" select="$ticket"/>
+                    <xsl:with-param name="branch" select="."/>
+                </xsl:call-template>
+            </xsl:for-each>
+        </div>
+
+    </xsl:template>
+
+    <xsl:template name="ticket-output">
+        <xsl:param name="ticket"/>
+        <xsl:param name="branch"/>
+
+        <xsl:variable name="commits" select="$ticket/commit[@branch = $branch/@address]" />
+
+        <xsl:if test="$commits">
+            <div class="branch">branch: <xsl:value-of select="$branch/@name"/></div>
+
+            <xsl:for-each select="$commits">
+                 <div class="msg"><b>Commit:</b> <xsl:text> </xsl:text>
+                     <a target="_blank">
+                         <xsl:attribute name="href">
+                             <xsl:text>https://github.com</xsl:text><xsl:value-of select="@url"/>
+                         </xsl:attribute>
+                         <xsl:value-of select="@id"/>
+                     </a>
+                     <br/><b>Author:</b> <xsl:text> </xsl:text> <xsl:value-of select="@author"/>
+                     <br/><b>Date:</b> <xsl:text> </xsl:text> <xsl:value-of select="@date"/><br/>
+                     <br/>
+                    <xsl:value-of select="."/>
+                 </div>
+            </xsl:for-each>
+
+        </xsl:if>
+
     </xsl:template>
 
     <xsl:template name="branches-output">
         <xsl:param name="ticket"/>
 
-        <xsl:for-each select="//github-plugin-document/branches/branch[@visible='true']">
-            <xsl:call-template name="branch-output">
-                <xsl:with-param name="address" select="@address"/>
-                <xsl:with-param name="ticket" select="$ticket"/>
-            </xsl:call-template>
-        </xsl:for-each>
+        <div style="float: right">
+            <xsl:for-each select="//github-plugin-document/branches/branch[@visible='true']">
+                <xsl:call-template name="branch-output">
+                    <xsl:with-param name="address" select="@address"/>
+                    <xsl:with-param name="name" select="@name"/>
+                    <xsl:with-param name="ticket" select="$ticket"/>
+                </xsl:call-template>
+            </xsl:for-each>
+        </div>
 
     </xsl:template>
 
     <xsl:template name="branch-output">
         <xsl:param name="address"/>
         <xsl:param name="ticket"/>
+        <xsl:param name="name"/>
 
-        <td>
-            <xsl:for-each select="$ticket/commit[@branch = $address]">
-                <a target="_blank">
-                    <xsl:attribute name="href">
-                        <xsl:text>https://github.com</xsl:text><xsl:value-of select="@url"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="title">
-                        <xsl:text> Author: </xsl:text><xsl:value-of select="@author"/>
-                        <xsl:text> </xsl:text>
-                        <xsl:text> Date: </xsl:text><xsl:value-of select="@date"/>
-                        <xsl:text> </xsl:text>
-                        <xsl:text> </xsl:text><xsl:value-of select="."/>
-                    </xsl:attribute>
-                    <xsl:text>yes</xsl:text>
-                </a>
-            </xsl:for-each>
-
-            <xsl:if test="not($ticket/commit[@branch = $address])">
-                <xsl:text>no</xsl:text>
-            </xsl:if>
-        </td>
+        <div>
+            <xsl:choose>
+                <xsl:when test="$ticket/commit[@branch = $address]">
+                    <xsl:attribute name="class">marker bold</xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:attribute name="class">marker gray</xsl:attribute>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:value-of select="$name"/>
+        </div>
 
     </xsl:template>
 </xsl:stylesheet>

@@ -5,6 +5,7 @@
 
 package com.enonic.cms.plugin.github.writer;
 
+import java.util.List;
 import java.util.Map;
 
 import org.jdom.Document;
@@ -21,6 +22,7 @@ public class XMLDocumentCreator
     {
         Element documentEl = new Element( "github-plugin-document" );
 
+
         Element branchesEl = new Element( "branches" );
 
         Branch[] branches = statisticsDocument.getBranches();
@@ -33,38 +35,71 @@ public class XMLDocumentCreator
             branchEl.setAttribute( "visible", "" + branch.getVisible() );
             branchesEl.addContent( branchEl );
         }
+        documentEl.addContent( branchesEl );
+
+
 
         Element ticketsEl = new Element( "tickets" );
 
-        for ( Map.Entry<String, Commit[]> entry : statisticsDocument.getTickets().entrySet() )
+        createTicketElement( ticketsEl, StatisticsDocument.UNRECOGNIZED_TICKET, statisticsDocument.getTickets().get( StatisticsDocument.UNRECOGNIZED_TICKET ) );
+
+        for ( Map.Entry<String, List<Commit>[]> entry : statisticsDocument.getTickets().entrySet() )
         {
-            Element ticketEl = new Element( "ticket" );
-            ticketEl.setAttribute( "code", entry.getKey() );
-
-            for ( Commit commit : entry.getValue() )
+            if ( StatisticsDocument.UNRECOGNIZED_TICKET.equals( entry.getKey() ) )
             {
-                if (commit != null)
-                {
-                    ticketEl.setAttribute( "message", commit.getShortMessage() );
-
-                    Element commitEl = new Element( "commit" );
-                    commitEl.setAttribute( "branch", commit.getAddress() );
-                    commitEl.setAttribute( "url", commit.getUrl() );
-                    commitEl.setAttribute( "author", commit.getAuthor().getName() );
-                    commitEl.setAttribute( "date", commit.getCommitted_date() );
-                    commitEl.setAttribute( "login", commit.getAuthor().getLogin() );
-                    commitEl.setText( commit.getMessage() );
-                    ticketEl.addContent( commitEl );
-                }
+                continue;
             }
 
-            ticketsEl.addContent( ticketEl );
+            createTicketElement( ticketsEl, entry.getKey(), entry.getValue() );
         }
 
-        documentEl.addContent( branchesEl );
         documentEl.addContent( ticketsEl );
 
 
+
         return new Document( documentEl );
+    }
+
+    private void createTicketElement( Element ticketsEl, String ticket, List<Commit>[] commitsList )
+    {
+        if (commitsList == null)
+        {
+            return;
+        }
+
+        Element ticketEl = new Element( "ticket" );
+        ticketEl.setAttribute( "code", ticket );
+
+        for ( List<Commit> commits : commitsList )
+        {
+            if ( commits == null )
+            {
+                continue;
+            }
+
+            String message = null;
+
+            for (Commit commit : commits)
+            {
+                if ( message == null || !commit.getMessage().startsWith( "Merge branch" ) )
+                {
+                    message = commit.getShortMessage();
+                }
+
+                Element commitEl = new Element( "commit" );
+                commitEl.setAttribute( "id", commit.getId() );
+                commitEl.setAttribute( "branch", commit.getAddress() );
+                commitEl.setAttribute( "url", commit.getUrl() );
+                commitEl.setAttribute( "author", commit.getAuthor().getName() );
+                commitEl.setAttribute( "date", commit.getCommitted_date() );
+                commitEl.setAttribute( "login", commit.getAuthor().getLogin() );
+                commitEl.setText( commit.getMessage() );
+                ticketEl.addContent( commitEl );
+            }
+
+            ticketEl.setAttribute( "message", message );
+        }
+
+        ticketsEl.addContent( ticketEl );
     }
 }

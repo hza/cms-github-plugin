@@ -25,22 +25,27 @@ public final class GitHubPlugin
      *
      * @param username user name in VCS
      * @param password password
+     * @param names - branch names
      * @param branches comma separated short names of branches
-     * @param depth of analysis - count of commits to analyze for each branch. multiple unit is equal to 35
+     * @param depthes of analysis - count of commits to analyze for each branch. multiple unit is equal to 35
      * @param ticketsFilter - comma separated filter for tickets
+     * @param branchesFilter - comma separated filter for branches
      * @return XML document
      */
-    public Document getStatistics( String username, String password, String names, String branches, int depth, String ticketsFilter, String branchesFilter )
+    public Document getStatistics( String username, String password, String names, String branches, String depthes, String ticketsFilter, String branchesFilter )
     {
         LOGGER.info( "parameters: username: " + username + ", password: ***, branches: "
-                             + branches + ", depth: " + depth + ", tickets-filter: '" + ticketsFilter + "', branches-filter: '" + branchesFilter + "'");
+                             + branches + ", depthes: " + depthes + ", tickets-filter: '" + ticketsFilter + "', branches-filter: '" + branchesFilter + "'");
 
         long time = System.currentTimeMillis();
 
-        StatisticsDocument statisticsDocument = new V1StaticticsDocument( names, branches, ticketsFilter, branchesFilter );
+        StatisticsDocument statisticsDocument = new V1StaticticsDocument( names, branches, depthes, ticketsFilter, branchesFilter );
 
-        Reader reader = new GitHubReader( username, password, depth );
-        reader.readBranches( statisticsDocument );
+        if ( ticketsFilter != null && !"".equals( ticketsFilter ) )
+        {
+            Reader reader = new GitHubReader( username, password );
+            reader.readBranches( statisticsDocument );
+        }
 
         // dump document to console
         // System.out.println( statisticsDocument.toString() );

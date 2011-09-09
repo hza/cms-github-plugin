@@ -34,17 +34,17 @@ public class GitHubPluginTest
               properties.getProperty( "password" ),
               properties.getProperty( "branchNames" ),
               properties.getProperty( "branchAddresses" ),
-              100,
-              "",
+              "100;100;100;100",
+              "-",
               "4.4 5.0"
         );
 
         Assert.assertNotNull( document );
-/*
+/* */
         XMLOutputter output = new XMLOutputter( Format.getPrettyFormat());
         String xmlString = output.outputString(document);
         System.out.println(xmlString);
-*/
+/* */
     }
 
     @Before

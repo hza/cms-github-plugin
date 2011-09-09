@@ -5,6 +5,7 @@ public class Branch
     private String name;
     private String address;
     private boolean visible;
+    private int pages;
 
     public Branch()
     {
@@ -39,5 +40,13 @@ public class Branch
     public void setVisible( boolean visible )
     {
         this.visible = visible;
+    }
+
+    public int getPages() {
+        return pages;
+    }
+
+    public void setPages(int pages) {
+        this.pages = pages;
     }
 }

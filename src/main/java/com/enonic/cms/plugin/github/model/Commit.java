@@ -9,6 +9,8 @@ import java.util.Date;
 
 public class Commit
 {
+    private String id;
+
     private String message;
 
     private String committed_date; // json required Date for de-serialization
@@ -29,6 +31,16 @@ public class Commit
 
     public Commit()
     {
+    }
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public void setId( String id )
+    {
+        this.id = id;
     }
 
     public String getAddress()

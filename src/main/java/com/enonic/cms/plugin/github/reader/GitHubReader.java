@@ -38,13 +38,10 @@ public class GitHubReader
 
     private final String credentials;
 
-    private final int pages;
-
-    public GitHubReader( String username, String password, int depth )
+    public GitHubReader( String username, String password )
     {
         mapper.configure( DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false );
         credentials = encode( username + ":" + password );
-        this.pages = ( depth / 35 ) + 1;
     }
 
     /**
@@ -57,20 +54,25 @@ public class GitHubReader
     public void readBranches( StatisticsDocument document )
     {
         int branchNum = 0;
+
         for ( Branch branch : document.getBranches() )
         {
-            for ( int page = 1; page < pages + 1; page++ )
+            if (branch.getVisible())
             {
-                String address = GITHUB_API_LIST + branch.getAddress() + PAGE_PARAM + page;
-
-                List<Commit> commits = readBranchByAddress( address );
-
-                if ( commits.isEmpty() )
+                for ( int page = 0; page < branch.getPages(); page++ )
                 {
-                    break;
+                    String address = GITHUB_API_LIST + branch.getAddress() + PAGE_PARAM + ( page + 1 );
+
+                    List<Commit> commits = readBranchByAddress( address );
+
+                    if ( commits.isEmpty() )
+                    {
+                        break;
+                    }
+                    document.addCommits( commits, branchNum );
                 }
-                document.addCommits( commits, branchNum );
             }
+
             branchNum++;
         }
     }

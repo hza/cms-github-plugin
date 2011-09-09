@@ -13,9 +13,11 @@ import com.enonic.cms.plugin.github.model.Commit;
 
 public interface StatisticsDocument
 {
+    String UNRECOGNIZED_TICKET = "B-00000";
+
     void addCommits( List<Commit> commits, int branch );
 
-    Map<String, Commit[]> getTickets();
+    Map<String, List<Commit>[]> getTickets();
 
     Branch[] getBranches();
 }
