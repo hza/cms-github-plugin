@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
   ~ Copyright (c) 2011, Enonic and/or its affiliates. All rights reserved.
   ~ ENONIC PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
@@ -12,7 +13,7 @@
       <parameter name="password" type="string">***</parameter>
       <parameter name="names" type="string">4.4;4.5;4.6;5.0</parameter>
       <parameter name="branches" type="string">enonic/cms-app/4.4;enonic/cms-app/master;enonic/cms-ce/master;enonic/cms-ce/5.0</parameter>
-      <parameter name="depth" type="int">100</parameter>
+      <parameter name="depthes" type="string">100;100;100;100</parameter>
       <parameter name="ticketsFilter" type="string">${param.tickets}</parameter>
       <parameter name="branchesFilter" type="string">${param.branches}</parameter>
     </parameters>
